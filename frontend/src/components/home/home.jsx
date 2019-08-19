@@ -2,16 +2,13 @@ import React from "react";
 import DashboardCard from "./dashboardCard";
 import * as Graphs from "../../dashboardOptions";
 
-function max(a, b) {
-    return a > b ? a : b;
-}
 
 const Home = () => {
     return (
         <div className="card-deck">
             <DashboardCard
                 minHeight="400px"
-                minWidth={max(window.innerWidth / 4, 350) + "px"}
+                minWidth="300px"
                 header="Current Month"
                 id="test"
                 chartOption={Graphs.currentMonthBenchmarkOptions(
@@ -23,7 +20,7 @@ const Home = () => {
 
             <DashboardCard
                 minHeight="400px"
-                minWidth={max(window.innerWidth / 3, 350) + "px"}
+                minWidth="500px"
                 header="Previous 6 Months"
                 id="test2"
                 chartOption={Graphs.recentMonthsBenchmarkOption(
@@ -35,7 +32,7 @@ const Home = () => {
 
             <DashboardCard
                 minHeight="400px"
-                minWidth={max(window.innerWidth / 4, 350) + "px"}
+                minWidth="350px"
                 header='Asset Distribution'
                 id="test3"
                 chartOption={Graphs.assetDistributionOption()}

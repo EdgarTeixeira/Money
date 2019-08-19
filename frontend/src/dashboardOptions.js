@@ -131,8 +131,8 @@ export function assetDistributionOption(data) {
             formatter: "{a} <br/>{b}: {c} ({d}%)"
         },
         legend: {
-            orient: 'vertical',
-            x: 'left',
+            orient: 'horizontal',
+            x: 'center',
             data: ['BRCR11', 'BCRI11', 'BIDI4', 'SQIA3', 'BIDI11']
         },
         series: [
@@ -151,7 +151,8 @@ export function assetDistributionOption(data) {
                         textStyle: {
                             fontSize: '30',
                             fontWeight: 'bold'
-                        }
+                        },
+                        formatter: '{b}\n{d}%'
                     }
                 },
                 labelLine: {

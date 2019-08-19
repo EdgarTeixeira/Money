@@ -1,17 +1,18 @@
 import React, { useState } from "react";
 import InsertAssetModal from "./forms/insertAsset/insertAssetModal";
+import InsertEventModal from "./forms/insertEvent/insertEventModal";
 import AssetList from "./asset/assetList";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 
 const Wallet = () => {
     // Show Insert Asset Form
-    const [showCreate, setShowCreate] = useState(false);
+    const [showAsset, setShowAsset] = useState(false);
     const handleAssetClose = () => {
-        setShowCreate(false);
+        setShowAsset(false);
     };
     const handleAssetShow = () => {
-        setShowCreate(true);
+        setShowAsset(true);
     };
 
     // Show Insert Event Form
@@ -29,7 +30,11 @@ const Wallet = () => {
                 <Button className="font-weight-bold" onClick={handleAssetShow}>
                     New Application
                 </Button>
-                <Button className="font-weight-bold" variant="info">
+                <Button
+                    className="font-weight-bold"
+                    variant="info"
+                    onClick={handleEventShow}
+                >
                     New Event
                 </Button>
             </ButtonGroup>
@@ -38,8 +43,15 @@ const Wallet = () => {
             <InsertAssetModal
                 method="POST"
                 action="/wallet/assets"
-                show={showCreate}
+                show={showAsset}
                 handleClose={handleAssetClose}
+            />
+
+            <InsertEventModal
+                method="POST"
+                action="/wallet/assets"
+                show={showEvent}
+                handleClose={handleEventClose}
             />
         </div>
     );

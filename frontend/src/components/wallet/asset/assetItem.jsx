@@ -63,7 +63,7 @@ const AssetItem = props => {
                             </p>
                         </Col>
                         <Col
-                            sm={1}
+                            sm={2}
                             className="align-self-center d-flex flex-column"
                         >
                             <ButtonGroup vertical>
