@@ -1,8 +1,9 @@
 import React from "react";
+import Form from "react-bootstrap/Form";
 
 const TicketInput = props => {
     return (
-        <input
+        <Form.Control
             type="text"
             className="form-control"
             id={props.id}

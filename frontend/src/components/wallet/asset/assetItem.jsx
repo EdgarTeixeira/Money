@@ -3,6 +3,8 @@ import Card from "react-bootstrap/Card";
 import Accordion from "react-bootstrap/Accordion";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Button from "react-bootstrap/Button";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
 
 const AssetItem = props => {
     return (
@@ -19,13 +21,10 @@ const AssetItem = props => {
                         </h5>
                     </Col>
                     <Col sm={2} className="align-self-center">
-                        <h2 className="text-center">
-                            {getRentability(
-                                props.amountInvested,
-                                props.quotas * props.currentPrice
-                            )}
-                            %
-                        </h2>
+                        {getRentabilityElement(
+                            props.amountInvested,
+                            props.quotas * props.currentPrice
+                        )}
                     </Col>
                 </Row>
             </Accordion.Toggle>
@@ -63,6 +62,25 @@ const AssetItem = props => {
                                 </span>
                             </p>
                         </Col>
+                        <Col
+                            sm={1}
+                            className="align-self-center d-flex flex-column"
+                        >
+                            <ButtonGroup vertical>
+                                <Button
+                                    variant="outline-primary"
+                                    className="font-weight-bold"
+                                >
+                                    New
+                                </Button>
+                                <Button
+                                    variant="outline-secondary"
+                                    className="font-weight-bold"
+                                >
+                                    Edit
+                                </Button>
+                            </ButtonGroup>
+                        </Col>
                     </Row>
                 </Card.Body>
             </Accordion.Collapse>
@@ -72,6 +90,13 @@ const AssetItem = props => {
 
 function getRentability(invested, current) {
     return ((current - invested) / invested).toFixed(2);
+}
+
+function getRentabilityElement(invested, current) {
+    let rentability = getRentability(invested, current);
+    let textColor = rentability < 0.0 ? "text-danger" : "text-success";
+
+    return <h2 className={"text-center " + textColor}>{rentability}%</h2>;
 }
 
 export default AssetItem;

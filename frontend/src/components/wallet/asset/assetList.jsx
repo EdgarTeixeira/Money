@@ -4,7 +4,7 @@ import AssetItem from "./assetItem";
 
 const AssetList = props => {
     return (
-        <Accordion className="w-75 mx-auto my-3">
+        <Accordion className="w-75 mx-auto my-2" defaultActiveKey="0">
             <AssetItem
                 assetName="Banco Inter"
                 assetSymbol="BIDI11"

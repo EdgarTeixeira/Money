@@ -1,10 +1,11 @@
 import React from "react";
+import Form from "react-bootstrap/Form";
 
 // https://webdesign.tutsplus.com/tutorials/auto-formatting-input-value--cms-26745
 
 const DateInput = props => {
     return (
-        <input
+        <Form.Control
             type="text"
             className={props.className}
             name={props.name}

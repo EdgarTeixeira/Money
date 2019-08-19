@@ -1,8 +1,9 @@
 import React from "react";
+import Form from "react-bootstrap/Form";
 
 const MoneyInput = props => {
     return (
-        <input
+        <Form.Control
             type="text"
             className={props.className}
             id={props.id}
