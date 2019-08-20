@@ -7,7 +7,6 @@ const DateInput = props => {
     return (
         <Form.Control
             type="text"
-            className={props.className}
             name={props.name}
             id={props.id}
             onInput={formatDate}

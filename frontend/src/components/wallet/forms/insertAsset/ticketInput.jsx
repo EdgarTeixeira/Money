@@ -5,7 +5,6 @@ const TicketInput = props => {
     return (
         <Form.Control
             type="text"
-            className="form-control"
             id={props.id}
             name={props.name}
             placeholder={props.placeholder}

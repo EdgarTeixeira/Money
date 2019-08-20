@@ -48,7 +48,6 @@ const InsertAssetForm = props => {
                             type="number"
                             min="1"
                             defaultValue="1"
-                            className="form-control"
                             id="quantity"
                             name="quantity"
                             placeholder="0"
@@ -69,7 +68,6 @@ const InsertAssetForm = props => {
                         </Form.Label>
                         <DateInput
                             id="transactionDate"
-                            className="form-control"
                             placeholder="mm/dd/yyyy"
                             name="transaction_date"
                         />
@@ -86,7 +84,6 @@ const InsertAssetForm = props => {
                         </Form.Label>
                         <MoneyInput
                             id="taxes"
-                            className="form-control"
                             placeholder="R$ 0.00"
                             name="taxes"
                         />

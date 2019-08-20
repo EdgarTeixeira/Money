@@ -5,7 +5,6 @@ const MoneyInput = props => {
     return (
         <Form.Control
             type="text"
-            className={props.className}
             id={props.id}
             name={props.name}
             placeholder={props.placeholder}
