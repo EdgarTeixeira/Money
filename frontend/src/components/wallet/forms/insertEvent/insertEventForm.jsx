@@ -16,11 +16,16 @@ const InsertEvenrtForm = props => {
     };
 
     const [hideSplit, setHideSplit] = useState(false);
-    const handleEventTypeSelection = (event) => {
-        console.log(event);
-        console.log('Current Target', event.currentTarget);
-        console.log('Target', event.target);
-    }
+    const handleEventTypeSelection = event => {
+        const select = event.target;
+        const selectedOption = select.options[select.selectedIndex].text;
+
+        if (selectedOption === "Split") {
+            setHideSplit(false);
+        } else {
+            setHideSplit(true);
+        }
+    };
 
     return (
         <Form
@@ -38,8 +43,9 @@ const InsertEvenrtForm = props => {
                 </Form.Control>
             </Form.Group>
 
-            <div hidden={hideSplit}>
+            <div className="mt-5" hidden={hideSplit}>
                 <h3>Split</h3>
+                <hr />
                 <Form.Row>
                     <Col>
                         <Form.Group>
@@ -68,8 +74,9 @@ const InsertEvenrtForm = props => {
                 </Form.Row>
             </div>
 
-            <div hidden={!hideSplit}>
+            <div className="mt-5" hidden={!hideSplit}>
                 <h3>Unitization</h3>
+                <hr />
                 <Form.Row>
                     <Col>
                         <Form.Group>
