@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
+import TicketInput from "../insertAsset/ticketInput";
 
 const InsertEvenrtForm = props => {
     const [validated, setValidated] = useState(false);
@@ -88,6 +89,16 @@ const InsertEvenrtForm = props => {
                         </Form.Group>
                     </Col>
 
+                    <Col>
+                        <Form.Group>
+                            <Form.Label>To</Form.Label>
+                            <TicketInput />
+                            <Form.Control.Feedback type='invalid'>To is a required field!</Form.Control.Feedback>
+                        </Form.Group>
+                    </Col>
+                </Form.Row>
+
+                <Form.Row>
                     <Col>
                         <Form.Group>
                             <Form.Label>Amount</Form.Label>
