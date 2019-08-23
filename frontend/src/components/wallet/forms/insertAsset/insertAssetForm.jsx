@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import MoneyInput from "./moneyInput";
-import DateInput from "./dateInput";
-import TicketInput from "./ticketInput";
+import MoneyInput from "../moneyInput";
+import DateInput from "../dateInput";
+import TicketInput from "../ticketInput";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";

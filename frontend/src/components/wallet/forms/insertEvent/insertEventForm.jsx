@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
-import TicketInput from "../insertAsset/ticketInput";
+import TicketInput from "../ticketInput";
 
 const InsertEvenrtForm = props => {
     const [validated, setValidated] = useState(false);
