@@ -1,12 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import Card from "react-bootstrap/Card";
 import Accordion from "react-bootstrap/Accordion";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
+import InsertAssetModal from "../forms/insertAsset/insertAssetModal";
 
 const AssetItem = props => {
+    // Show Insert Asset Form
+    const [showAsset, setShowAsset] = useState(false);
+    const handleAssetClose = () => {
+        setShowAsset(false);
+    };
+    const handleAssetShow = () => {
+        setShowAsset(true);
+    };
+
     return (
         <Card border="primary">
             <Accordion.Toggle as={Card.Header} eventKey={props.eventKey}>
@@ -70,6 +80,7 @@ const AssetItem = props => {
                                 <Button
                                     variant="outline-primary"
                                     className="font-weight-bold"
+                                    onClick={handleAssetShow}
                                 >
                                     New
                                 </Button>
@@ -82,6 +93,14 @@ const AssetItem = props => {
                             </ButtonGroup>
                         </Col>
                     </Row>
+
+                    <InsertAssetModal
+                        method="POST"
+                        action="/wallet/assets"
+                        show={showAsset}
+                        handleClose={handleAssetClose}
+                        initialTicketValue={props.assetSymbol}
+                    />
                 </Card.Body>
             </Accordion.Collapse>
         </Card>

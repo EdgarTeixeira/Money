@@ -8,11 +8,17 @@ const TicketInput = props => {
             id={props.id}
             name={props.name}
             placeholder={props.placeholder}
+            value={props.initialValue}
             onInput={formatAssetTicket}
+            readOnly={wasInitialized(props.initialValue)}
             required
         />
     );
 };
+
+function wasInitialized(initialValue) {
+    return initialValue !== undefined;
+}
 
 function formatAssetTicket(event) {
     const input = document.activeElement.value;

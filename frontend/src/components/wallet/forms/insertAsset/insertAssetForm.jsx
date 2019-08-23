@@ -34,6 +34,7 @@ const InsertAssetForm = props => {
                             id="assetTicket"
                             name="ticket"
                             placeholder="Asset Ticket"
+                            initialValue={props.initialTicketValue}
                         />
                         <Form.Control.Feedback type="invalid">
                             Ticket is a required field!
