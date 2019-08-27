@@ -27,10 +27,31 @@ const UpdateTransactionForm = props => {
                 <Col>
                     <Form.Group>
                         <Form.Label>Transaction Type</Form.Label>
-                        <Form.Control as="select">
-                            <option>Buy</option>
-                            <option>Sell</option>
-                        </Form.Control>
+                        <div>
+                            <Form.Check
+                                custom
+                                inline
+                                type="radio"
+                                name="transaction_type"
+                                id="inlineRadio1"
+                                value="buy"
+                                label="Buy"
+                                checked={props.initialValues.transactionType === 'B'}
+                                required
+                            />
+
+                            <Form.Check
+                                custom
+                                inline
+                                type="radio"
+                                name="transaction_type"
+                                id="inlineRadio2"
+                                value="sell"
+                                label="Sell"
+                                checked={props.initialValues.transactionType === 'S'}
+                                required
+                            />
+                        </div>
                     </Form.Group>
                 </Col>
 

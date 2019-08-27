@@ -60,7 +60,8 @@ const TransactionCard = props => {
                 initialValues={{
                     quotas: props.quotas,
                     price: props.price,
-                    taxes: props.taxes
+                    taxes: props.taxes,
+                    transactionType: props.transactionType === 'BUY' ? 'B' : 'S'
                 }}
             />
         </Card>
