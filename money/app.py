@@ -67,7 +67,8 @@ class Transactions(db.Model):
     _when = db.Column('when', db.TIMESTAMP(), nullable=False)
     quotas = db.Column(db.Integer, nullable=False)
     _price = db.Column('price', db.BIGINT(), nullable=False)
-    _transaction_type = db.Column('transaction_type', db.String(1), nullable=False)
+    _transaction_type = db.Column(
+        'transaction_type', db.String(1), nullable=False)
     assets_id = db.Column(db.Integer, db.ForeignKey(
         'assets.assets_id'), nullable=False)
 
@@ -118,7 +119,8 @@ class Transactions(db.Model):
         value = value.strip().upper()
 
         if value not in "BS":
-            raise ValueError("TransactionType must be B (for BUY) or S (for SELL)")
+            raise ValueError(
+                "TransactionType must be B (for BUY) or S (for SELL)")
         self._transaction_type = value
 
     def to_dict(self):
@@ -258,9 +260,22 @@ def insert_assets():
 
 @app.route('/wallet/assets', methods=['GET'])
 def list_assets():
-    assets = [item.to_dict() for item in Assets.query.all()]
+    assets = db.session.query(Assets).all()
 
-    return jsonify(assets), 200
+    """
+    SELECT assets_stats.*, assets.name, assets.symbol
+    FROM assets,
+	     (SELECT assets_id id,
+	  	    	 SUM(quotas) quotas,
+			     ROUND(AVG(price / 1e9), 2) avg_price,
+			     ROUND(MAX(price / 1e9), 2) max_price,
+			     ROUND(SUM(price / 1e9), 2) invested
+	      FROM transactions
+	      GROUP BY assets_id) AS assets_stats
+    WHERE assets.assets_id = assets_stats.id;
+    """
+
+    return jsonify([asset.to_dict() for asset in assets]), 200
 
 
 @app.route('/wallet/assets/<int:asset_id>', methods=['GET'])
