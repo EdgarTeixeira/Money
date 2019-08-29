@@ -36,7 +36,9 @@ const UpdateTransactionForm = props => {
                                 id="inlineRadio1"
                                 value="buy"
                                 label="Buy"
-                                checked={props.initialValues.transactionType === 'B'}
+                                defaultChecked={
+                                    props.initialValues.transactionType === "B"
+                                }
                                 required
                             />
 
@@ -48,25 +50,12 @@ const UpdateTransactionForm = props => {
                                 id="inlineRadio2"
                                 value="sell"
                                 label="Sell"
-                                checked={props.initialValues.transactionType === 'S'}
+                                defaultChecked={
+                                    props.initialValues.transactionType === "S"
+                                }
                                 required
                             />
                         </div>
-                    </Form.Group>
-                </Col>
-
-                <Col>
-                    <Form.Group>
-                        <Form.Label>Quotas</Form.Label>
-                        <Form.Control
-                            type="number"
-                            min="1"
-                            defaultValue={props.initialValues.quotas}
-                            required
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            Quotas is a required field!
-                        </Form.Control.Feedback>
                     </Form.Group>
                 </Col>
             </Form.Row>
@@ -94,6 +83,21 @@ const UpdateTransactionForm = props => {
                         />
                         <Form.Control.Feedback type="invalid">
                             Taxes is a required field!
+                        </Form.Control.Feedback>
+                    </Form.Group>
+                </Col>
+
+                <Col>
+                    <Form.Group>
+                        <Form.Label>Quotas</Form.Label>
+                        <Form.Control
+                            type="number"
+                            min="1"
+                            defaultValue={props.initialValues.quotas}
+                            required
+                        />
+                        <Form.Control.Feedback type="invalid">
+                            Quotas is a required field!
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Col>
