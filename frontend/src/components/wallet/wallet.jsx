@@ -38,6 +38,7 @@ const Wallet = () => {
                     New Event
                 </Button>
             </ButtonGroup>
+
             <AssetList />
 
             <InsertAssetModal
