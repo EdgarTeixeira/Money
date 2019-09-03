@@ -262,6 +262,19 @@ def insert_assets():
 def list_assets():
     assets = db.session.query(Assets).all()
 
+    asset_id = Assets.id.label('assets_id')
+    quotas = db.func.sum(Assets.quotas).label('quotas')
+    avg_price = db.func.round(db.func.avg(Assets.price / 1e9), 2).label('avg_price')
+    max_price = db.func.round(db.func.max(Assets.price / 1e9), 2).label('max_price')
+    invested = db.func.round(db.func.sum(Assets.price / 1e9), 2).label('invested')
+    subquery = db.session.query(asset_id, avg_price, max_price, invested)\
+                         .group_by(Assets.id)\
+                         .subquery()
+
+    assets = db.session.query(subquery, Assets.name, Assets.symbol)
+                       .filter(subquery.c.assets_id == Assets.id)\
+                       .all()
+
     """
     SELECT assets_stats.*, assets.name, assets.symbol
     FROM assets,
