@@ -4,26 +4,7 @@ import AssetItem from "./assetItem";
 
 class AssetList extends Component {
     state = {
-        assets: [
-            {
-                name: "Banco Inter",
-                symbol: "BIDI11",
-                price: 18.07,
-                quotas: 53,
-                avgPrice: 10.07,
-                maxPrice: 14.04,
-                invested: 1000
-            },
-            {
-                name: "Suzano",
-                symbol: "SUZB3",
-                price: 10.09,
-                quotas: 10,
-                avgPrice: 8.05,
-                maxPrice: 9.95,
-                invested: 100
-            }
-        ]
+        assets: []
     };
 
     constructor() {
@@ -33,7 +14,7 @@ class AssetList extends Component {
             .then(status)
             .then(json)
             .then(data => {
-                console.log(data);
+                this.setState({assets: data});
             })
             .catch(error => {
                 console.log("ERROR:", error);
