@@ -11,6 +11,7 @@ from utils import HistoricalCalculator, Prices
 app = Flask(__name__, static_folder='build/static', template_folder='build')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://postgres:postgres@localhost/money'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ECHO'] = False
 db = SQLAlchemy(app)
 
 
@@ -262,33 +263,29 @@ def insert_assets():
 def list_assets():
     assets = db.session.query(Assets).all()
 
-    asset_id = Assets.id.label('assets_id')
-    quotas = db.func.sum(Assets.quotas).label('quotas')
-    avg_price = db.func.round(db.func.avg(Assets.price / 1e9), 2).label('avg_price')
-    max_price = db.func.round(db.func.max(Assets.price / 1e9), 2).label('max_price')
-    invested = db.func.round(db.func.sum(Assets.price / 1e9), 2).label('invested')
-    subquery = db.session.query(asset_id, avg_price, max_price, invested)\
-                         .group_by(Assets.id)\
-                         .subquery()
+    asset_id = Transactions.assets_id
+    quotas = db.func.sum(Transactions.quotas).label('quotas')
 
-    assets = db.session.query(subquery, Assets.name, Assets.symbol)
-                       .filter(subquery.c.assets_id == Assets.id)\
+    avg_price = db.func.round(db.func.avg(Transactions._price / 1e9), 2)
+    avg_price = db.cast(avg_price, db.Float).label('avg_price')
+
+    max_price = db.func.round(db.func.max(Transactions._price / 1e9), 2)
+    max_price = db.cast(max_price, db.Float).label('max_price')
+
+    invested = db.func.round(db.func.sum(Transactions._price / 1e9 * Transactions.quotas), 2)
+    invested = db.cast(invested, db.Float).label('invested')
+
+    subquery = db.session.query(asset_id, quotas, avg_price, max_price, invested)\
+        .group_by(Transactions.assets_id)\
+        .subquery()
+
+    name = Assets._name.label('name')
+    symbol = Assets._symbol.label('symbol')
+    assets = db.session.query(subquery, name, symbol)\
+                       .filter(subquery.c.assets_id == Assets.assets_id)\
                        .all()
 
-    """
-    SELECT assets_stats.*, assets.name, assets.symbol
-    FROM assets,
-	     (SELECT assets_id id,
-	  	    	 SUM(quotas) quotas,
-			     ROUND(AVG(price / 1e9), 2) avg_price,
-			     ROUND(MAX(price / 1e9), 2) max_price,
-			     ROUND(SUM(price / 1e9), 2) invested
-	      FROM transactions
-	      GROUP BY assets_id) AS assets_stats
-    WHERE assets.assets_id = assets_stats.id;
-    """
-
-    return jsonify([asset.to_dict() for asset in assets]), 200
+    return jsonify([asset._asdict() for asset in assets]), 200
 
 
 @app.route('/wallet/assets/<int:asset_id>', methods=['GET'])
@@ -442,5 +439,5 @@ def index():
     return render_template('index.html')
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
