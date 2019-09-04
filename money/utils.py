@@ -117,10 +117,15 @@ class Prices:
         return output
 
     @staticmethod
-    def current_asset(ticker: str) -> float:
-        ticker = ticker + '.SA'
+    def current_asset(ticker: str) -> Dict[str, float]:
+        ticker = ticker + '.SA' if isinstance(ticker, str) else [t + '.SA' for t in ticker]
         asset = yf.YahooFinancials(ticker)
-        return asset.get_current_price()
+
+        prices = asset.get_current_price()
+        return {
+            key[:-3]: value
+            for key, value in prices.items()
+        }
 
 
 class HistoricalCalculator:

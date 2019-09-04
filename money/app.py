@@ -267,10 +267,10 @@ def list_assets():
     quotas = db.func.sum(Transactions.quotas).label('quotas')
 
     avg_price = db.func.round(db.func.avg(Transactions._price / 1e9), 2)
-    avg_price = db.cast(avg_price, db.Float).label('avg_price')
+    avg_price = db.cast(avg_price, db.Float).label('avgPrice')
 
     max_price = db.func.round(db.func.max(Transactions._price / 1e9), 2)
-    max_price = db.cast(max_price, db.Float).label('max_price')
+    max_price = db.cast(max_price, db.Float).label('maxPrice')
 
     invested = db.func.round(db.func.sum(Transactions._price / 1e9 * Transactions.quotas), 2)
     invested = db.cast(invested, db.Float).label('invested')
@@ -285,7 +285,14 @@ def list_assets():
                        .filter(subquery.c.assets_id == Assets.assets_id)\
                        .all()
 
-    return jsonify([asset._asdict() for asset in assets]), 200
+    prices = Prices.current_asset([asset.symbol for asset in assets])
+    assets = [asset._asdict() for asset in assets]
+
+    for idx in range(len(assets)):
+        ticker = assets[idx]['symbol']
+        assets[idx]['price'] = prices[ticker]
+
+    return jsonify(assets), 200
 
 
 @app.route('/wallet/assets/<int:asset_id>', methods=['GET'])
