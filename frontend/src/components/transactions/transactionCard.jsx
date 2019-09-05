@@ -45,7 +45,9 @@ const TransactionCard = props => {
                     </Button>
                     <Button
                         variant="outline-danger"
-                        onClick={deleteTransaction}
+                        onClick={() => {
+                            props.onDelete(props.transactionId);
+                        }}
                     >
                         Delete
                     </Button>
@@ -61,15 +63,11 @@ const TransactionCard = props => {
                     quotas: props.quotas,
                     price: props.price,
                     taxes: props.taxes,
-                    transactionType: props.transactionType === 'BUY' ? 'B' : 'S'
+                    transactionType: props.transactionType === "BUY" ? "B" : "S"
                 }}
             />
         </Card>
     );
 };
-
-function deleteTransaction() {
-    console.log("Delete button pressed.");
-}
 
 export default TransactionCard;

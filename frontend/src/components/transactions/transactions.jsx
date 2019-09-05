@@ -21,12 +21,30 @@ class Transactions extends Component {
             });
     }
 
+    handleDelete(transactionId) {
+        const url = "/wallet/transactions/" + transactionId;
+        fetch(url, { method: "DELETE" })
+            .then(status)
+            .then(json)
+            .then(data => {
+                let transactions = this.state.transactions.filter(t => {
+                    return t.transactionId !== transactionId;
+                });
+
+                this.setState({ transactions: transactions });
+            })
+            .catch(error => {
+                console.log("ERROR", error);
+            });
+    }
+
     render() {
         return (
             <CardColumns className="mt-5 w-75 mx-auto">
                 {this.state.transactions.map((transaction, index) => {
                     return (
                         <TransactionCard
+                            transactionId={transaction.transaction_id}
                             assetSymbol={transaction.assetSymbol}
                             assetName={transaction.assetName}
                             quotas={transaction.quotas}
@@ -38,6 +56,7 @@ class Transactions extends Component {
                             price={transaction.price}
                             taxes={transaction.taxes}
                             key={index}
+                            onDelete={this.handleDelete}
                         />
                     );
                 })}

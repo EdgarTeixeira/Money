@@ -462,7 +462,7 @@ def delete_transaction(transaction_id: int):
         app.logger.error('Unknown SQLAlchemy error.', exc_info=True)
         raise
 
-    return jsonify(transaction.to_dict()), 200
+    return "", 200
 
 
 # TODO: Insert IOF + Taxes in Selic benchmark
