@@ -270,7 +270,8 @@ def list_assets():
     max_price = db.func.round(db.func.max(Transactions._price / 1e9), 2)
     max_price = db.cast(max_price, db.Float).label('maxPrice')
 
-    invested = db.func.round(db.func.sum(Transactions._price / 1e9 * Transactions.quotas), 2)
+    invested = db.func.round(db.func.sum(
+        Transactions._price / 1e9 * Transactions.quotas), 2)
     invested = db.cast(invested, db.Float).label('invested')
 
     subquery = db.session.query(asset_id, quotas, avg_price, max_price, invested)\
@@ -295,7 +296,7 @@ def list_assets():
 
 @app.route('/wallet/assets/<int:asset_id>', methods=['GET'])
 def get_asset_by_id(asset_id: int):
-    asset_id = Transactions.assets_id
+    assets_id = Transactions.assets_id
     quotas = db.func.sum(Transactions.quotas).label('quotas')
 
     avg_price = db.func.round(db.func.avg(Transactions._price / 1e9), 2)
@@ -307,19 +308,25 @@ def get_asset_by_id(asset_id: int):
     invested = db.func.round(db.func.sum(Transactions._price / 1e9 * Transactions.quotas), 2)
     invested = db.cast(invested, db.Float).label('invested')
 
-    subquery = db.session.query(asset_id, quotas, avg_price, max_price, invested)\
+    subquery = db.session.query(assets_id, quotas, avg_price, max_price, invested)\
         .group_by(Transactions.assets_id)\
+        .having(Transactions.assets_id == asset_id)\
         .subquery()
-    
+
     name = Assets._name.label('name')
     symbol = Assets._symbol.label('symbol')
-    assets = db.session.query(subquery, name, symbol)\
-                       .filter(subquery.c.assets_id == asset_id)\
-                       .one_or_none()
+    asset = db.session.query(subquery, name, symbol)\
+                      .filter(subquery.c.assets_id == Assets.assets_id)\
+                      .one_or_none()
 
     if asset is None:
         return "", 404
-    return jsonify(asset.to_dict()), 200
+
+    price = Prices.current_asset(asset.symbol)
+    asset = asset._asdict()
+    asset['price'] = price[asset['symbol']]
+
+    return jsonify(asset), 200
 
 
 @app.route('/wallet/assets/<int:asset_id>', methods=['PUT', 'PATCH'])

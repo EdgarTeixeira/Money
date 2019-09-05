@@ -122,6 +122,11 @@ class Prices:
         asset = yf.YahooFinancials(ticker)
 
         prices = asset.get_current_price()
+        if isinstance(prices, float):
+            return {
+                ticker[:-3]: prices
+            }
+
         return {
             key[:-3]: value
             for key, value in prices.items()

@@ -19,7 +19,7 @@ const AssetItem = props => {
 
     // FIXME: Calculo da rentabilidade está incorreto
     return (
-        <Card border="primary">
+        <Card border="primary" className="border-bottom rounded">
             <Accordion.Toggle as={Card.Header} eventKey={props.eventKey}>
                 <Row>
                     <Col sm={10}>
