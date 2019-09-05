@@ -1,56 +1,61 @@
-import React from "react";
+import React, { Component } from "react";
 import CardColumns from "react-bootstrap/CardColumns";
 import TransactionCard from "./transactionCard";
 
-const Transactions = () => {
-    return (
-        <CardColumns className="mt-5 w-75 mx-auto">
-            <TransactionCard
-                assetSymbol="BIDI11"
-                assetName="Banco Inter"
-                quotas={2}
-                transactionType="BUY"
-                price={10.0}
-                taxes={0.01}
-            />
+class Transactions extends Component {
+    state = {
+        transactions: []
+    };
 
-            <TransactionCard
-                assetSymbol="BIDI11"
-                assetName="Banco Inter"
-                quotas={5}
-                transactionType="SELL"
-                price={100.0}
-                taxes={0.11}
-            />
+    constructor() {
+        super();
 
-            <TransactionCard
-                assetSymbol="BIDI11"
-                assetName="Banco Inter"
-                quotas={2}
-                transactionType="BUY"
-                price={10.0}
-                taxes={0.01}
-            />
+        fetch("wallet/transactions")
+            .then(status)
+            .then(json)
+            .then(data => {
+                this.setState({ transactions: data });
+            })
+            .catch(error => {
+                console.log("ERROR: ", error);
+            });
+    }
 
-            <TransactionCard
-                assetSymbol="BIDI11"
-                assetName="Banco Inter"
-                quotas={2}
-                transactionType="BUY"
-                price={10.0}
-                taxes={0.01}
-            />
+    render() {
+        return (
+            <CardColumns className="mt-5 w-75 mx-auto">
+                {this.state.transactions.map((transaction, index) => {
+                    return (
+                        <TransactionCard
+                            assetSymbol={transaction.assetSymbol}
+                            assetName={transaction.assetName}
+                            quotas={transaction.quotas}
+                            transactionType={
+                                transaction.transactionType === "B"
+                                    ? "BUY"
+                                    : "SELL"
+                            }
+                            price={transaction.price}
+                            taxes={transaction.taxes}
+                            key={index}
+                        />
+                    );
+                })}
+            </CardColumns>
+        );
+    }
+}
 
-            <TransactionCard
-                assetSymbol="BIDI11"
-                assetName="Banco Inter"
-                quotas={2}
-                transactionType="BUY"
-                price={10.0}
-                taxes={0.01}
-            />
-        </CardColumns>
-    );
-};
+function status(response) {
+    if (response.status >= 200 && response.status < 300) {
+        return Promise.resolve(response);
+    } else {
+        return Promise.reject(new Error(response.statusText));
+    }
+}
+
+function json(response) {
+    return response.json();
+}
 
 export default Transactions;

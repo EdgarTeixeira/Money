@@ -387,18 +387,37 @@ def insert_transaction():
 
 @app.route('/wallet/transactions', methods=['GET'])
 def list_transactions():
-    transactions = [item.to_dict() for item in Transactions.query.all()]
+    id = Transactions.transaction_id
+    symbol = Assets._symbol.label('assetSymbol')
+    name = Assets._name.label('assetName')
+    quotas = Transactions.quotas
+    transaction_type = Transactions._transaction_type.label('transactionType')
+    price = db.cast(db.func.round((Transactions._price / 1e9), 2), db.Float).label('price')
 
-    return jsonify(transactions), 200
+    transactions = db.session.query(id, symbol, name, quotas, transaction_type, price)\
+                     .select_from(Assets)\
+                     .join(Transactions)\
+                     .all()
+
+    return jsonify([t._asdict() for t in transactions]), 200
 
 
 @app.route('/wallet/transactions/<int:transaction_id>', methods=['GET'])
 def get_transaction_by_id(transaction_id: int):
-    transaction = Transactions.query.get(transaction_id)
+    id = Transactions.transaction_id
+    symbol = Assets._symbol.label('assetSymbol')
+    name = Assets._name.label('assetName')
+    quotas = Transactions.quotas
+    transaction_type = Transactions._transaction_type.label('transactionType')
+    price = db.cast(db.func.round((Transactions._price / 1e9), 2), db.Float).label('price')
+
+    transaction = db.session.query(id, symbol, name, quotas, transaction_type, price)\
+                    .filter(Transactions.transaction_id == transaction_id)\
+                    .one_or_none()
 
     if transaction is None:
         return "", 404
-    return jsonify(transaction.to_dict()), 200
+    return jsonify(transaction._asdict()), 200
 
 
 @app.route('/wallet/transactions/<int:transaction_id>', methods=['PUT', 'PATCH'])
