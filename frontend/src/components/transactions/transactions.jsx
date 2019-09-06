@@ -21,22 +21,22 @@ class Transactions extends Component {
             });
     }
 
-    handleDelete(transactionId) {
+    handleDelete = transactionId => {
         const url = "/wallet/transactions/" + transactionId;
         fetch(url, { method: "DELETE" })
             .then(status)
             .then(json)
             .then(data => {
                 let transactions = this.state.transactions.filter(t => {
-                    return t.transactionId !== transactionId;
+                    return t.transaction_id !== transactionId;
                 });
 
                 this.setState({ transactions: transactions });
             })
             .catch(error => {
-                console.log("ERROR", error);
+                console.error(error);
             });
-    }
+    };
 
     render() {
         return (

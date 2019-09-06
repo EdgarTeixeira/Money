@@ -305,7 +305,8 @@ def get_asset_by_id(asset_id: int):
     max_price = db.func.round(db.func.max(Transactions._price / 1e9), 2)
     max_price = db.cast(max_price, db.Float).label('maxPrice')
 
-    invested = db.func.round(db.func.sum(Transactions._price / 1e9 * Transactions.quotas), 2)
+    invested = db.func.round(db.func.sum(
+        Transactions._price / 1e9 * Transactions.quotas), 2)
     invested = db.cast(invested, db.Float).label('invested')
 
     subquery = db.session.query(assets_id, quotas, avg_price, max_price, invested)\
@@ -392,7 +393,8 @@ def list_transactions():
     name = Assets._name.label('assetName')
     quotas = Transactions.quotas
     transaction_type = Transactions._transaction_type.label('transactionType')
-    price = db.cast(db.func.round((Transactions._price / 1e9), 2), db.Float).label('price')
+    price = db.cast(db.func.round(
+        (Transactions._price / 1e9), 2), db.Float).label('price')
 
     transactions = db.session.query(id, symbol, name, quotas, transaction_type, price)\
                      .select_from(Assets)\
@@ -409,7 +411,8 @@ def get_transaction_by_id(transaction_id: int):
     name = Assets._name.label('assetName')
     quotas = Transactions.quotas
     transaction_type = Transactions._transaction_type.label('transactionType')
-    price = db.cast(db.func.round((Transactions._price / 1e9), 2), db.Float).label('price')
+    price = db.cast(db.func.round(
+        (Transactions._price / 1e9), 2), db.Float).label('price')
 
     transaction = db.session.query(id, symbol, name, quotas, transaction_type, price)\
                     .filter(Transactions.transaction_id == transaction_id)\
@@ -455,6 +458,8 @@ def delete_transaction(transaction_id: int):
         if transaction is None:
             return "", 404
 
+        response = transaction.to_dict()
+
         db.session.delete(transaction)
         db.session.commit()
     except SQLAlchemy:
@@ -462,7 +467,7 @@ def delete_transaction(transaction_id: int):
         app.logger.error('Unknown SQLAlchemy error.', exc_info=True)
         raise
 
-    return "", 200
+    return jsonify(response), 200
 
 
 # TODO: Insert IOF + Taxes in Selic benchmark
