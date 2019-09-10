@@ -7,12 +7,20 @@ const UpdateTransactionForm = props => {
     const [validated, setValidated] = useState(false);
     const handleSubmit = event => {
         const form = event.currentTarget;
+        // form.elements['price'].value;
+
         if (form.checkValidity() === false) {
-            event.preventDefault();
             event.stopPropagation();
+        } else {
+            fetch("/wallet/transactions", { method: "PUT" });
+
+            props.onAction();
         }
 
+        event.preventDefault();
         setValidated(true);
+
+        return false;
     };
 
     return (
@@ -66,6 +74,7 @@ const UpdateTransactionForm = props => {
                         <Form.Label>Price</Form.Label>
                         <Form.Control
                             defaultValue={props.initialValues.price}
+                            name="price"
                             required
                         />
                         <Form.Control.Feedback type="invalid">
@@ -79,6 +88,7 @@ const UpdateTransactionForm = props => {
                         <Form.Label>Taxes</Form.Label>
                         <Form.Control
                             defaultValue={props.initialValues.taxes}
+                            name="taxes"
                             required
                         />
                         <Form.Control.Feedback type="invalid">
@@ -94,6 +104,7 @@ const UpdateTransactionForm = props => {
                             type="number"
                             min="1"
                             defaultValue={props.initialValues.quotas}
+                            name="quotas"
                             required
                         />
                         <Form.Control.Feedback type="invalid">

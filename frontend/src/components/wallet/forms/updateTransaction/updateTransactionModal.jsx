@@ -13,6 +13,7 @@ const UpdateTransactionModal = props => {
                     method={props.method}
                     action={props.action}
                     initialValues={props.initialValues}
+                    onAction={props.handleClose}
                 />
             </Modal.Body>
         </Modal>

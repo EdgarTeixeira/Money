@@ -4,7 +4,16 @@ import TransactionCard from "./transactionCard";
 
 class Transactions extends Component {
     state = {
-        transactions: []
+        transactions: [
+            {
+                assetName: "Sinqia",
+                assetSymbol: "SQIA3",
+                price: 10.13,
+                quotas: 10,
+                transactionType: "S",
+                transaction_id: 10
+            }
+        ]
     };
 
     constructor() {

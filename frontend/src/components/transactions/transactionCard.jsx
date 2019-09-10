@@ -57,8 +57,8 @@ const TransactionCard = props => {
             <UpdateTransactionModal
                 show={show}
                 handleClose={handleClose}
-                method="POST"
-                action="transactions"
+                method="PUT"
+                action={"wallet/transactions/" + props.transactionId}
                 initialValues={{
                     quotas: props.quotas,
                     price: props.price,
