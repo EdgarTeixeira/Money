@@ -12,7 +12,20 @@ const UpdateTransactionForm = props => {
         if (form.checkValidity() === false) {
             event.stopPropagation();
         } else {
-            fetch("/wallet/transactions", { method: "PUT" });
+            const headers = {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            };
+            const body = {
+                price: parseFloat(form.elements["price"].value),
+                quotas: parseInt(form.elements["quotas"].value)
+            };
+
+            fetch(props.action, {
+                method: "PUT",
+                headers: headers,
+                body: JSON.stringify(body)
+            });
 
             props.onAction();
         }
