@@ -25,7 +25,15 @@ const UpdateTransactionForm = props => {
                 method: "PUT",
                 headers: headers,
                 body: JSON.stringify(body)
-            });
+            })
+                .then(status)
+                .then(json)
+                .then(data => {
+                    console.log(data);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
 
             props.onAction();
         }
@@ -131,5 +139,17 @@ const UpdateTransactionForm = props => {
         </Form>
     );
 };
+
+function status(response) {
+    if (response.status >= 200 && response.status < 300) {
+        return Promise.resolve(response);
+    } else {
+        return Promise.reject(new Error(response.statusText));
+    }
+}
+
+function json(response) {
+    return response.json();
+}
 
 export default UpdateTransactionForm;
