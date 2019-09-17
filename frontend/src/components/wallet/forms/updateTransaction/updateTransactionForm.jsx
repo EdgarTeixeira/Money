@@ -29,7 +29,11 @@ const UpdateTransactionForm = props => {
                 .then(status)
                 .then(json)
                 .then(data => {
+<<<<<<< HEAD
                     props.onUpdate(data);
+=======
+                    console.log(data);
+>>>>>>> 9bf841aa48e9c06d6b151450a223d74009dd54df
                 })
                 .catch(error => {
                     console.error(error);
