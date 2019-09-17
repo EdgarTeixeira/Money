@@ -4,16 +4,16 @@ import UpdateTransactionForm from "./updateTransactionForm";
 
 const UpdateTransactionModal = props => {
     return (
-        <Modal show={props.show} onHide={props.handleClose} size="xl">
+        <Modal show={props.show} onHide={props.onClose} size="xl">
             <Modal.Header closeButton>
                 <Modal.Title>Insert New Event</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <UpdateTransactionForm
-                    method={props.method}
                     action={props.action}
                     initialValues={props.initialValues}
-                    onAction={props.handleClose}
+                    onSuccessfulSubmit={props.onClose}
+                    onUpdate={props.onUpdate}
                 />
             </Modal.Body>
         </Modal>

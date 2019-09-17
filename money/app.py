@@ -448,7 +448,16 @@ def update_transaction(transaction_id: int):
         app.logger.error('Unknown SQLAlchemy error.', exc_info=True)
         raise
 
-    return jsonify(transaction.to_dict()), 200
+    response = {
+        "assetName": transaction.asset.name,
+        "assetSymbol": transaction.asset.symbol,
+        "price": transaction.price,
+        "quotas": transaction.quotas,
+        "transactionType": transaction.transaction_type,
+        "transaction_id": transaction.transaction_id
+    }
+
+    return jsonify(response), 200
 
 
 @app.route('/wallet/transactions/<int:transaction_id>', methods=['DELETE'])

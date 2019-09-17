@@ -16,26 +16,34 @@ const TransactionCard = props => {
     return (
         <Card border="primary">
             <Card.Header>
-                <Card.Title>{props.assetSymbol}</Card.Title>
+                <Card.Title>{props.transaction.assetSymbol}</Card.Title>
                 <Card.Subtitle className="mb-2 text-muted">
-                    {props.assetName}
+                    {props.transaction.assetName}
                 </Card.Subtitle>
             </Card.Header>
             <Card.Body>
                 <Card.Text>
                     Type:{" "}
                     <span className="font-weight-bold">
-                        {props.transactionType}
+                        {props.transaction.transactionType === "B"
+                            ? "BUY"
+                            : "SELL"}
                     </span>
                     <br />
                     Quotas:{" "}
-                    <span className="font-weight-bold">{props.quotas}</span>
+                    <span className="font-weight-bold">
+                        {props.transaction.quotas}
+                    </span>
                     <br />
                     Price:{" "}
-                    <span className="font-weight-bold">R$ {props.price}</span>
+                    <span className="font-weight-bold">
+                        R$ {props.transaction.price}
+                    </span>
                     <br />
                     Taxes:{" "}
-                    <span className="font-weight-bold">R$ {props.taxes}</span>
+                    <span className="font-weight-bold">
+                        R$ {props.transaction.taxes}
+                    </span>
                 </Card.Text>
             </Card.Body>
             <Card.Footer>
@@ -46,7 +54,7 @@ const TransactionCard = props => {
                     <Button
                         variant="outline-danger"
                         onClick={() => {
-                            props.onDelete(props.transactionId);
+                            props.onDelete(props.transaction.transaction_id);
                         }}
                     >
                         Delete
@@ -56,14 +64,16 @@ const TransactionCard = props => {
 
             <UpdateTransactionModal
                 show={show}
-                handleClose={handleClose}
-                method="PUT"
-                action={"wallet/transactions/" + props.transactionId}
+                onClose={handleClose}
+                onUpdate={props.onUpdate}
+                action={
+                    "wallet/transactions/" + props.transaction.transaction_id
+                }
                 initialValues={{
-                    quotas: props.quotas,
-                    price: props.price,
-                    taxes: props.taxes,
-                    transactionType: props.transactionType === "BUY" ? "B" : "S"
+                    quotas: props.transaction.quotas,
+                    price: props.transaction.price,
+                    taxes: props.transaction.taxes,
+                    transactionType: props.transaction.transactionType
                 }}
             />
         </Card>

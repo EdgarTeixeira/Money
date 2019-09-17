@@ -7,7 +7,6 @@ const UpdateTransactionForm = props => {
     const [validated, setValidated] = useState(false);
     const handleSubmit = event => {
         const form = event.currentTarget;
-        // form.elements['price'].value;
 
         if (form.checkValidity() === false) {
             event.stopPropagation();
@@ -16,6 +15,7 @@ const UpdateTransactionForm = props => {
                 Accept: "application/json",
                 "Content-Type": "application/json"
             };
+            // TODO: Add other fields to update
             const body = {
                 price: parseFloat(form.elements["price"].value),
                 quotas: parseInt(form.elements["quotas"].value)
@@ -25,9 +25,17 @@ const UpdateTransactionForm = props => {
                 method: "PUT",
                 headers: headers,
                 body: JSON.stringify(body)
-            });
+            })
+                .then(status)
+                .then(json)
+                .then(data => {
+                    props.onUpdate(data);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
 
-            props.onAction();
+            props.onSuccessfulSubmit();
         }
 
         event.preventDefault();
@@ -38,7 +46,6 @@ const UpdateTransactionForm = props => {
 
     return (
         <Form
-            method={props.method}
             action={props.action}
             noValidate
             validated={validated}
@@ -131,5 +138,17 @@ const UpdateTransactionForm = props => {
         </Form>
     );
 };
+
+function status(response) {
+    if (response.status >= 200 && response.status < 300) {
+        return Promise.resolve(response);
+    } else {
+        return Promise.reject(new Error(response.statusText));
+    }
+}
+
+function json(response) {
+    return response.json();
+}
 
 export default UpdateTransactionForm;
