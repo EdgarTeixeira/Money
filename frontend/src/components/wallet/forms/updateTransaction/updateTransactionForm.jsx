@@ -15,12 +15,13 @@ const UpdateTransactionForm = props => {
                 Accept: "application/json",
                 "Content-Type": "application/json"
             };
-            // TODO: Add other fields to update
+            
             const body = {
                 price: parseFloat(form.elements["price"].value),
-                quotas: parseInt(form.elements["quotas"].value)
+                quotas: parseInt(form.elements["quotas"].value),
+                transaction_type: form.elements['transaction_type'].value
             };
-
+            
             fetch(props.action, {
                 method: "PUT",
                 headers: headers,
@@ -29,11 +30,7 @@ const UpdateTransactionForm = props => {
                 .then(status)
                 .then(json)
                 .then(data => {
-<<<<<<< HEAD
                     props.onUpdate(data);
-=======
-                    console.log(data);
->>>>>>> 9bf841aa48e9c06d6b151450a223d74009dd54df
                 })
                 .catch(error => {
                     console.error(error);
@@ -66,7 +63,7 @@ const UpdateTransactionForm = props => {
                                 type="radio"
                                 name="transaction_type"
                                 id="inlineRadio1"
-                                value="buy"
+                                value="B"
                                 label="Buy"
                                 defaultChecked={
                                     props.initialValues.transactionType === "B"
@@ -80,7 +77,7 @@ const UpdateTransactionForm = props => {
                                 type="radio"
                                 name="transaction_type"
                                 id="inlineRadio2"
-                                value="sell"
+                                value="S"
                                 label="Sell"
                                 defaultChecked={
                                     props.initialValues.transactionType === "S"

@@ -5,17 +5,54 @@ import TicketInput from "../ticketInput";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
+import * as moment from "moment";
 
 const InsertAssetForm = props => {
     const [validated, setValidated] = useState(false);
     const handleSubmit = event => {
         const form = event.currentTarget;
+
         if (form.checkValidity() === false) {
-            event.preventDefault();
             event.stopPropagation();
+        } else {
+            const headers = {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            };
+
+            const body = {
+                ticket: form.elements["ticket"].value,
+                asset_name: form.elements["asset_name"].value,
+                price: parseFloat(form.elements["price"].value.substr(2)),
+                quantity: parseInt(form.elements["quantity"].value),
+                transaction_date: moment(
+                    form.elements["transaction_date"].value,
+                    "MM/DD/YYYY"
+                ).format("YYYY-MM-DD"),
+                transaction_type: form.elements["transaction_type"].value
+            };
+
+            fetch("/wallet/transactions", {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify(body)
+            })
+                .then(status)
+                .then(json)
+                .then(data => {
+                    console.log(data);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+
+            props.onSuccessfulSubmit();
         }
 
+        event.preventDefault();
         setValidated(true);
+
+        return false;
     };
 
     return (
@@ -59,9 +96,34 @@ const InsertAssetForm = props => {
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Col>
+
+                <Col>
+                    <Form.Group>
+                        <Form.Label>Name</Form.Label>
+                        <Form.Control
+                            type="text"
+                            id="assetName"
+                            name="asset_name"
+                        />
+                    </Form.Group>
+                </Col>
             </Form.Row>
 
             <Form.Row>
+                <Col>
+                    <Form.Group>
+                        <Form.Label>Price</Form.Label>
+                        <MoneyInput
+                            id="price"
+                            name="price"
+                            placeholder="R$ 0.00"
+                        />
+                        <Form.Control.Feedback type="invalid">
+                            Price is a required field!
+                        </Form.Control.Feedback>
+                    </Form.Group>
+                </Col>
+
                 <Col>
                     <Form.Group>
                         <Form.Label htmlFor="transactionDate">
@@ -108,7 +170,7 @@ const InsertAssetForm = props => {
                                 type="radio"
                                 name="transaction_type"
                                 id="inlineRadio1"
-                                value="buy"
+                                value="B"
                                 label="Buy"
                                 required
                             />
@@ -119,7 +181,7 @@ const InsertAssetForm = props => {
                                 type="radio"
                                 name="transaction_type"
                                 id="inlineRadio2"
-                                value="sell"
+                                value="S"
                                 label="Sell"
                                 required
                             />
@@ -135,5 +197,17 @@ const InsertAssetForm = props => {
         </Form>
     );
 };
+
+function status(response) {
+    if (response.status >= 200 && response.status < 300) {
+        return Promise.resolve(response);
+    } else {
+        return Promise.reject(new Error(response.statusText));
+    }
+}
+
+function json(response) {
+    return response.json();
+}
 
 export default InsertAssetForm;

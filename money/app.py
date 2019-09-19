@@ -75,12 +75,12 @@ class Transactions(db.Model):
 
     asset = db.relationship('Assets', back_populates='transactions')
 
-    def __init__(self, when: str, quotas: int, price: float, transaction_type: str, asset_id: int) -> None:
+    def __init__(self, when: str, quotas: int, price: float, transaction_type: str, assets_id: int) -> None:
         self.when = when
         self.quotas = quotas
         self.price = price
         self.transaction_type = transaction_type
-        self.assets_id = asset_id
+        self.assets_id = assets_id
 
     def __repr__(self) -> str:
         return f"Transactions(id={self.transaction_id},\
@@ -371,21 +371,52 @@ def delete_asset(asset_id: int):
     return jsonify(asset.to_dict()), 200
 
 
+# INTEGRATED AND FUNCTIONAL
 @app.route('/wallet/transactions', methods=['POST'])
 def insert_transaction():
-    transaction = Transactions(**request.get_json(silent=True))
+    body = request.get_json(silent=True)
+
+    # "Upsert" asset if name is available
+    asset = db.session.query(Assets)\
+        .filter(Assets._symbol == body['ticket'])\
+        .one_or_none()
+
+    if asset is None:
+        name = body['ticket'] if body['asset_name'] == "" else body['asset_name']
+        asset = Assets(body['ticket'], name)
+        db.session.add(asset)
+    elif body['asset_name'] != asset.name and body['asset_name'] != "":
+        asset.name = body['asset_name']
+        db.session.add(asset)
+
+    transaction = Transactions(when=body['transaction_date'].replace(" ", ""),
+                               quotas=body['quantity'],
+                               price=body['price'],
+                               transaction_type=body['transaction_type'],
+                               assets_id=None)
+    transaction.asset = asset
+    db.session.add(transaction)
 
     try:
-        db.session.add(transaction)
         db.session.commit()
     except SQLAlchemy:
         db.session.rollback()
         app.logger.error('Unknow SQLAlchemy error.', exc_info=True)
         raise
 
-    return jsonify(transaction.to_dict()), 201
+    response = {
+        "assetName": transaction.asset.name,
+        "assetSymbol": transaction.asset.symbol,
+        "price": transaction.price,
+        "quotas": transaction.quotas,
+        "transactionType": transaction.transaction_type,
+        "transaction_id": transaction.transaction_id
+    }
+
+    return jsonify(response), 201
 
 
+# INTEGRATED AND FUNCTIONAL
 @app.route('/wallet/transactions', methods=['GET'])
 def list_transactions():
     id = Transactions.transaction_id
@@ -404,6 +435,7 @@ def list_transactions():
     return jsonify([t._asdict() for t in transactions]), 200
 
 
+# INTEGRATED AND FUNCTIONAL
 @app.route('/wallet/transactions/<int:transaction_id>', methods=['GET'])
 def get_transaction_by_id(transaction_id: int):
     id = Transactions.transaction_id
@@ -423,6 +455,7 @@ def get_transaction_by_id(transaction_id: int):
     return jsonify(transaction._asdict()), 200
 
 
+# INTEGRATED AND FUNCTIONAL
 @app.route('/wallet/transactions/<int:transaction_id>', methods=['PUT', 'PATCH'])
 def update_transaction(transaction_id: int):
     transaction = Transactions.query.get(transaction_id)
@@ -460,6 +493,7 @@ def update_transaction(transaction_id: int):
     return jsonify(response), 200
 
 
+# INTEGRATED AND FUNCTIONAL
 @app.route('/wallet/transactions/<int:transaction_id>', methods=['DELETE'])
 def delete_transaction(transaction_id: int):
     try:

@@ -9,7 +9,12 @@ const InsertAssetModal = props => {
                 <Modal.Title>Insert New Asset</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <InsertAssetForm method={props.method} action={props.action} initialTicketValue={props.initialTicketValue} />
+                <InsertAssetForm
+                    method={props.method}
+                    action={props.action}
+                    initialTicketValue={props.initialTicketValue}
+                    onSuccessfulSubmit={props.handleClose}
+                />
             </Modal.Body>
         </Modal>
     );

@@ -97,7 +97,7 @@ const AssetItem = props => {
 
                     <InsertAssetModal
                         method="POST"
-                        action="/wallet/assets"
+                        action="/wallet/transactions"
                         show={showAsset}
                         handleClose={handleAssetClose}
                         initialTicketValue={props.assetSymbol}
