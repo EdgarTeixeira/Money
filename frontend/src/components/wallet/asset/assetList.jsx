@@ -9,17 +9,20 @@ class AssetList extends Component {
 
     constructor() {
         super();
+        this.handleUpdate();
+    }
 
+    handleUpdate = () => {
         fetch("wallet/assets")
             .then(status)
             .then(json)
             .then(data => {
-                this.setState({assets: data});
+                this.setState({ assets: data });
             })
             .catch(error => {
                 console.log("ERROR:", error);
             });
-    }
+    };
 
     render() {
         return (
@@ -28,14 +31,9 @@ class AssetList extends Component {
                 {this.state.assets.map((asset, index) => {
                     return (
                         <AssetItem
-                            assetName={asset.name}
-                            assetSymbol={asset.symbol}
-                            currentPrice={asset.price}
-                            quotas={asset.quotas}
+                            asset={asset}
                             eventKey={index.toString()}
-                            avgPrice={asset.avgPrice}
-                            maxPrice={asset.maxPrice}
-                            amountInvested={asset.invested}
+                            onUpdate={this.handleUpdate}
                             key={index}
                         />
                     );

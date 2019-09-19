@@ -23,18 +23,18 @@ const AssetItem = props => {
             <Accordion.Toggle as={Card.Header} eventKey={props.eventKey}>
                 <Row>
                     <Col sm={10}>
-                        <h2>{props.assetName}</h2>
+                        <h2>{props.asset.name}</h2>
                         <h4 className="font-weight-normal">
-                            {props.assetSymbol}
+                            {props.asset.symbol}
                         </h4>
                         <h5 className="font-weight-normal">
-                            R$ {props.currentPrice}
+                            R$ {props.asset.price}
                         </h5>
                     </Col>
                     <Col sm={2} className="align-self-center">
                         {getRentabilityElement(
-                            props.amountInvested,
-                            props.quotas * props.currentPrice
+                            props.asset.invested,
+                            props.asset.quotas * props.asset.price
                         )}
                     </Col>
                 </Row>
@@ -46,17 +46,17 @@ const AssetItem = props => {
                             <p>
                                 Quotas:{" "}
                                 <span className="font-weight-bold">
-                                    {props.quotas}
+                                    {props.asset.quotas}
                                 </span>
                                 <br className="mb-1" />
                                 Avg Price:{" "}
                                 <span className="font-weight-bold">
-                                    R$ {props.avgPrice}
+                                    R$ {props.asset.avgPrice}
                                 </span>
                                 <br className="mb-1" />
                                 Max Price:{" "}
                                 <span className="font-weight-bold">
-                                    R$ {props.maxPrice}
+                                    R$ {props.asset.maxPrice}
                                 </span>
                             </p>
                         </Col>
@@ -64,12 +64,12 @@ const AssetItem = props => {
                             <p>
                                 Total Investido:{" "}
                                 <span className="font-weight-bold">
-                                    R$ {props.amountInvested}
+                                    R$ {props.asset.invested}
                                 </span>
                                 <br className="mb-1" />
                                 Valor Atual:{" "}
                                 <span className="font-weight-bold">
-                                    R$ {props.quotas * props.currentPrice}
+                                    R$ {props.asset.quotas * props.asset.price}
                                 </span>
                             </p>
                         </Col>
@@ -99,8 +99,9 @@ const AssetItem = props => {
                         method="POST"
                         action="/wallet/transactions"
                         show={showAsset}
-                        handleClose={handleAssetClose}
-                        initialTicketValue={props.assetSymbol}
+                        onClose={handleAssetClose}
+                        onUpdate={props.onUpdate}
+                        initialTicketValue={props.asset.symbol}
                     />
                 </Card.Body>
             </Accordion.Collapse>

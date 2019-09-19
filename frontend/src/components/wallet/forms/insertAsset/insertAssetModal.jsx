@@ -4,7 +4,7 @@ import InsertAssetForm from "./insertAssetForm";
 
 const InsertAssetModal = props => {
     return (
-        <Modal show={props.show} onHide={props.handleClose} size="xl">
+        <Modal show={props.show} onHide={props.onClose} size="xl">
             <Modal.Header closeButton>
                 <Modal.Title>Insert New Asset</Modal.Title>
             </Modal.Header>
@@ -13,7 +13,8 @@ const InsertAssetModal = props => {
                     method={props.method}
                     action={props.action}
                     initialTicketValue={props.initialTicketValue}
-                    onSuccessfulSubmit={props.handleClose}
+                    onSuccessfulSubmit={props.onClose}
+                    onUpdate={props.onUpdate}
                 />
             </Modal.Body>
         </Modal>

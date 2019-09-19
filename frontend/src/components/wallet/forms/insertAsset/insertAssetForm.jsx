@@ -40,7 +40,7 @@ const InsertAssetForm = props => {
                 .then(status)
                 .then(json)
                 .then(data => {
-                    console.log(data);
+                    props.onUpdate();
                 })
                 .catch(error => {
                     console.error(error);
