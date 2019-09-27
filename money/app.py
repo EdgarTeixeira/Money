@@ -1,138 +1,34 @@
 from datetime import datetime
 
-from dateutil.tz import tzlocal, tzutc
+from dateutil.tz import tzlocal
 from flask import Flask, jsonify, render_template, request
-from flask_sqlalchemy import SQLAlchemy
 from scipy.optimize import minimize_scalar
 from sqlalchemy.exc import SQLAlchemyError
 
+from models import Assets, Transactions, db
 from utils import HistoricalCalculator, Prices
 
-app = Flask(__name__, static_folder='build/static', template_folder='build')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://postgres:postgres@localhost/money'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = False
-db = SQLAlchemy(app)
+
+def create_application():
+    from models import db
+    from controllers import api
+
+    app = Flask(__name__, static_folder='build/static',
+                template_folder='build')
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://postgres:postgres@localhost/money'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SQLALCHEMY_ECHO'] = False
+
+    db.init_app(app)
+    api.init_app(app)
+
+    return app
+
+
+app = create_application()
 
 
 # https://pt.stackoverflow.com/questions/188910/api-banco-central-ipca-e-selic
-
-
-class Assets(db.Model):
-    __tablename__ = 'assets'
-
-    assets_id = db.Column(db.Integer, primary_key=True)
-    _symbol = db.Column('symbol', db.String(10))
-    _name = db.Column('name', db.String(256))
-
-    transactions = db.relationship('Transactions', back_populates='asset')
-
-    def __init__(self, symbol: str, name: str) -> None:
-        self.symbol = symbol
-        self.name = name
-
-    @property
-    def symbol(self) -> str:
-        return self._symbol
-
-    @symbol.setter
-    def symbol(self, value: str) -> None:
-        self._symbol = value.strip().upper()
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @name.setter
-    def name(self, value: str) -> None:
-        self._name = value.strip()
-
-    def __repr__(self) -> str:
-        return f"Assets(id={self.id},\
-            symbol={self._symbol},\
-            name={self._name})"
-
-    def to_dict(self):
-        return {
-            'asset_id': self.assets_id,
-            'symbol': self._symbol,
-            'name': self._name
-        }
-
-
-# TODO: Add relationships between this model and the Assets' model
-class Transactions(db.Model):
-    __tablename__ = 'transactions'
-
-    transaction_id = db.Column(db.Integer, primary_key=True)
-    _when = db.Column('when', db.TIMESTAMP(), nullable=False)
-    quotas = db.Column(db.Integer, nullable=False)
-    _price = db.Column('price', db.BIGINT(), nullable=False)
-    _transaction_type = db.Column(
-        'transaction_type', db.String(1), nullable=False)
-    assets_id = db.Column(db.Integer, db.ForeignKey(
-        'assets.assets_id'), nullable=False)
-
-    asset = db.relationship('Assets', back_populates='transactions')
-
-    def __init__(self, when: str, quotas: int, price: float, transaction_type: str, assets_id: int) -> None:
-        self.when = when
-        self.quotas = quotas
-        self.price = price
-        self.transaction_type = transaction_type
-        self.assets_id = assets_id
-
-    def __repr__(self) -> str:
-        return f"Transactions(id={self.transaction_id},\
-            when={self.when},\
-            quotas={self.quotas},\
-            price={self.price},\
-            transaction_type={self.transaction_type},\
-            asset_id={self.assets_id})"
-
-    @property
-    def price(self) -> float:
-        return round(self._price / 1e9, 2)
-
-    @price.setter
-    def price(self, value: float) -> None:
-        self._price = int(value * 100) * 10_000_000
-
-    @property
-    def when(self) -> str:
-        if self._when.tzinfo is None:
-            return self._when.replace(tzinfo=tzutc()).isoformat(timespec='seconds')
-        return self._when.astimezone(tzutc()).isoformat(timespec='seconds')
-
-    @when.setter
-    def when(self, value: str) -> None:
-        timestamp = datetime.fromisoformat(value)
-        if timestamp.tzinfo is None:
-            self._when = timestamp.replace(tzinfo=tzutc())
-        self._when = timestamp.astimezone(tzutc())
-
-    @property
-    def transaction_type(self) -> str:
-        return self._transaction_type
-
-    @transaction_type.setter
-    def transaction_type(self, value: str) -> None:
-        value = value.strip().upper()
-
-        if value not in "BS":
-            raise ValueError(
-                "TransactionType must be B (for BUY) or S (for SELL)")
-        self._transaction_type = value
-
-    def to_dict(self):
-        return {
-            'transaction_id': self.transaction_id,
-            'when': self.when,
-            'quotas': self.quotas,
-            'price': self.price,
-            'transaction_type': self.transaction_type,
-            'asset': self.asset.to_dict()
-        }
 
 
 # TODO: Add taxes to calculations
@@ -346,7 +242,7 @@ def update_asset(asset_id: int):
     try:
         db.session.add(asset)
         db.session.commit()
-    except SQLAlchemy:
+    except SQLAlchemyError:
         db.session.rollback()
         app.logger.error('Unknown SQLAlchemy error.', exc_info=True)
         raise
@@ -363,154 +259,12 @@ def delete_asset(asset_id: int):
 
         db.session.delete(asset)
         db.session.commit()
-    except SQLAlchemy:
+    except SQLAlchemyError:
         db.session.rollback()
         app.logger.error("Unknown SQLAlchemy error", exc_info=True)
         raise
 
     return jsonify(asset.to_dict()), 200
-
-
-# INTEGRATED AND FUNCTIONAL
-@app.route('/wallet/transactions', methods=['POST'])
-def insert_transaction():
-    body = request.get_json(silent=True)
-
-    # "Upsert" asset if name is available
-    asset = db.session.query(Assets)\
-        .filter(Assets._symbol == body['ticket'])\
-        .one_or_none()
-
-    if asset is None:
-        name = body['ticket'] if body['asset_name'] == "" else body['asset_name']
-        asset = Assets(body['ticket'], name)
-        db.session.add(asset)
-    elif body['asset_name'] != asset.name and body['asset_name'] != "":
-        asset.name = body['asset_name']
-        db.session.add(asset)
-
-    transaction = Transactions(when=body['transaction_date'].replace(" ", ""),
-                               quotas=body['quantity'],
-                               price=body['price'],
-                               transaction_type=body['transaction_type'],
-                               assets_id=None)
-    transaction.asset = asset
-    db.session.add(transaction)
-
-    try:
-        db.session.commit()
-    except SQLAlchemy:
-        db.session.rollback()
-        app.logger.error('Unknow SQLAlchemy error.', exc_info=True)
-        raise
-
-    response = {
-        "assetName": transaction.asset.name,
-        "assetSymbol": transaction.asset.symbol,
-        "price": transaction.price,
-        "quotas": transaction.quotas,
-        "transactionType": transaction.transaction_type,
-        "transaction_id": transaction.transaction_id
-    }
-
-    return jsonify(response), 201
-
-
-# INTEGRATED AND FUNCTIONAL
-@app.route('/wallet/transactions', methods=['GET'])
-def list_transactions():
-    id = Transactions.transaction_id
-    symbol = Assets._symbol.label('assetSymbol')
-    name = Assets._name.label('assetName')
-    quotas = Transactions.quotas
-    transaction_type = Transactions._transaction_type.label('transactionType')
-    price = db.cast(db.func.round(
-        (Transactions._price / 1e9), 2), db.Float).label('price')
-
-    transactions = db.session.query(id, symbol, name, quotas, transaction_type, price)\
-                     .select_from(Assets)\
-                     .join(Transactions)\
-                     .all()
-
-    return jsonify([t._asdict() for t in transactions]), 200
-
-
-# INTEGRATED AND FUNCTIONAL
-@app.route('/wallet/transactions/<int:transaction_id>', methods=['GET'])
-def get_transaction_by_id(transaction_id: int):
-    id = Transactions.transaction_id
-    symbol = Assets._symbol.label('assetSymbol')
-    name = Assets._name.label('assetName')
-    quotas = Transactions.quotas
-    transaction_type = Transactions._transaction_type.label('transactionType')
-    price = db.cast(db.func.round(
-        (Transactions._price / 1e9), 2), db.Float).label('price')
-
-    transaction = db.session.query(id, symbol, name, quotas, transaction_type, price)\
-                    .filter(Transactions.transaction_id == transaction_id)\
-                    .one_or_none()
-
-    if transaction is None:
-        return "", 404
-    return jsonify(transaction._asdict()), 200
-
-
-# INTEGRATED AND FUNCTIONAL
-@app.route('/wallet/transactions/<int:transaction_id>', methods=['PUT', 'PATCH'])
-def update_transaction(transaction_id: int):
-    transaction = Transactions.query.get(transaction_id)
-    body = request.get_json(silent=True)
-
-    if transaction is None:
-        return "", 404
-
-    if 'when' in body:
-        transaction.when = body['when']
-    if 'quotas' in body:
-        transaction.quotas = body['quotas']
-    if 'price' in body:
-        transaction.price = body['price']
-    if 'transaction_type' in body:
-        transaction.transaction_type = body['transaction_type']
-
-    try:
-        db.session.add(transaction)
-        db.session.commit()
-    except SQLAlchemy:
-        db.session.rollback()
-        app.logger.error('Unknown SQLAlchemy error.', exc_info=True)
-        raise
-
-    response = {
-        "assetName": transaction.asset.name,
-        "assetSymbol": transaction.asset.symbol,
-        "price": transaction.price,
-        "quotas": transaction.quotas,
-        "transactionType": transaction.transaction_type,
-        "transaction_id": transaction.transaction_id
-    }
-
-    return jsonify(response), 200
-
-
-# INTEGRATED AND FUNCTIONAL
-@app.route('/wallet/transactions/<int:transaction_id>', methods=['DELETE'])
-def delete_transaction(transaction_id: int):
-    try:
-        transaction = Transactions.query.get(transaction_id)
-        if transaction is None:
-            return "", 404
-
-        response = transaction.to_dict()
-
-        db.session.delete(transaction)
-        db.session.commit()
-    except SQLAlchemy:
-        db.session.rollback()
-        app.logger.error('Unknown SQLAlchemy error.', exc_info=True)
-        raise
-
-    return jsonify(response), 200
 
 
 # TODO: Insert IOF + Taxes in Selic benchmark
@@ -539,4 +293,4 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
