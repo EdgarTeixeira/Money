@@ -2,7 +2,7 @@ from flask import request
 from flask_restful import Resource
 from sqlalchemy.exc import SQLAlchemyError
 
-from money.models import Assets, Transactions, db
+from models import Assets, Transactions, db
 
 from . import api
 

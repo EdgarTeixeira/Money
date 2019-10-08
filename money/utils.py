@@ -7,7 +7,7 @@ import requests
 import yahoofinancials as yf
 from dateutil.relativedelta import relativedelta
 
-
+# https://pt.stackoverflow.com/questions/188910/api-banco-central-ipca-e-selic
 # FIXME: relativedelta is possibily broken
 class Prices:
     IOF = {
