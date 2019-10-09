@@ -9,6 +9,8 @@ from dateutil.relativedelta import relativedelta
 
 # https://pt.stackoverflow.com/questions/188910/api-banco-central-ipca-e-selic
 # FIXME: relativedelta is possibily broken
+
+
 class Prices:
     IOF = {
         0: 100,
@@ -118,7 +120,8 @@ class Prices:
 
     @staticmethod
     def current_asset(ticker: str) -> Dict[str, float]:
-        ticker = ticker + '.SA' if isinstance(ticker, str) else [t + '.SA' for t in ticker]
+        ticker = ticker + \
+            '.SA' if isinstance(ticker, str) else [t + '.SA' for t in ticker]
         asset = yf.YahooFinancials(ticker)
 
         prices = asset.get_current_price()
